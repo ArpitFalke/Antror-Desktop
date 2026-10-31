@@ -1,52 +1,40 @@
-name: Build, Test & Release Antror Desktop
+name: Build & Release Antror Desktop
 
 on:
   push:
-    branches: [main]
-    tags: ['v*']
-  pull_request:
-    branches: [main]
+    tags:
+      - 'v*'
+      - '[0-9]+.*'
+  release:
+    types: [published, created]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag or release version (e.g. v1.0.0)'
+        required: false
+        default: 'v1.0.0'
+
+permissions:
+  contents: write
 
 jobs:
-  test:
-    name: Run Unit & E2E Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Run Tests
-        run: npm run test
-
-      - name: Run Build Check
-        run: npm run build
-
-  build-packages:
-    name: Package for ${{ matrix.os }}
-    needs: test
-    if: startsWith(github.ref, 'refs/tags/v')
+  release-packages:
+    name: Build & Release on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
         include:
-          - os: macos-latest
-            artifact: release/*.dmg
           - os: windows-latest
-            artifact: release/*.exe
+            platform_flag: --win
+          - os: macos-latest
+            platform_flag: --mac
           - os: ubuntu-latest
-            artifact: release/*.AppImage
+            platform_flag: --linux
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -54,19 +42,68 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Install Dependencies
-        run: npm ci
+      - name: Determine Release Tag
+        id: release_tag
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.release.tag_name }}" ]; then
+            echo "tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          elif [ -n "${{ inputs.tag_name }}" ]; then
+            echo "tag=${{ inputs.tag_name }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=v1.0.0" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Build Application
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Run automated tests
+        run: npm run test
+
+      - name: Build application assets
         run: npm run build
 
-      - name: Package App with electron-builder
+      - name: Package installer with electron-builder
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run dist
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+        run: npx electron-builder ${{ matrix.platform_flag }} --publish never
 
-      - name: Upload Artifacts
+      - name: List generated release artifacts
+        shell: bash
+        run: |
+          echo "=== Release directory contents ==="
+          ls -la release/
+
+      - name: Upload Artifacts to Workflow Run (Backup)
         uses: actions/upload-artifact@v4
         with:
           name: antror-desktop-${{ matrix.os }}
-          path: ${{ matrix.artifact }}
+          path: |
+            release/*.exe
+            release/*.dmg
+            release/*.zip
+            release/*.AppImage
+            release/*.deb
+            release/*.blockmap
+            release/latest*.yml
+          if-no-files-found: ignore
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_tag.outputs.tag }}
+          files: |
+            release/*.exe
+            release/*.dmg
+            release/*.zip
+            release/*.AppImage
+            release/*.deb
+            release/*.blockmap
+            release/latest*.yml
+          fail_on_unmatched_files: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

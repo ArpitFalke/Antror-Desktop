@@ -8,10 +8,13 @@
     "dist/**/*",
     "package.json"
   ],
+  "publish": {
+    "provider": "github"
+  },
   "mac": {
     "target": ["dmg", "zip"],
     "category": "public.app-category.productivity",
-    "hardenedRuntime": true,
+    "hardenedRuntime": false,
     "gatekeeperAssess": false,
     "entitlements": "build/entitlements.mac.plist",
     "entitlementsInherit": "build/entitlements.mac.inherit.plist"

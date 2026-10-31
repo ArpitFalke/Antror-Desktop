@@ -2,6 +2,9 @@ import * as esbuild from 'esbuild';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import postcss from 'postcss';
+import tailwindcss from 'tailwindcss';
+import autoprefixer from 'autoprefixer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,7 +17,18 @@ fs.mkdirSync(assetsDir, { recursive: true });
 async function buildRenderer() {
   console.log('Building renderer process...');
 
-  // 1. Bundle JS with esbuild
+  // 1. Compile Tailwind CSS
+  console.log('Compiling Tailwind CSS with PostCSS...');
+  const cssInputPath = path.resolve(root, 'src/renderer/src/index.css');
+  const cssInput = fs.readFileSync(cssInputPath, 'utf-8');
+  const postcssResult = await postcss([tailwindcss, autoprefixer]).process(cssInput, {
+    from: cssInputPath,
+    to: path.resolve(assetsDir, 'index.css')
+  });
+  fs.writeFileSync(path.resolve(assetsDir, 'index.css'), postcssResult.css);
+  console.log('CSS compiled successfully.');
+
+  // 2. Bundle JS with esbuild
   console.log('Bundling React client with esbuild...');
   await esbuild.build({
     entryPoints: [{ in: path.resolve(root, 'src/renderer/src/main.tsx'), out: 'main' }],
@@ -36,7 +50,7 @@ async function buildRenderer() {
     }
   });
 
-  // 2. Generate production index.html
+  // 3. Generate production index.html
   const htmlContent = `<!DOCTYPE html>
 <html lang="en">
   <head>
