@@ -9,7 +9,7 @@ export class AnthropicAdapter implements ProviderAdapter {
   defaultModels: ModelInfo[] = [
     {
       id: 'claude-3-7-sonnet-20250219',
-      name: 'Claude 3.7 Sonnet (Hybrid Reasoning)',
+      name: 'Claude 3.7 Sonnet (Hybrid Reasoning & Extended Thinking)',
       contextWindow: 200000,
       supportsVision: true,
       supportsThinking: true,
@@ -33,7 +33,15 @@ export class AnthropicAdapter implements ProviderAdapter {
     },
     {
       id: 'claude-3-opus-20240229',
-      name: 'Claude 3 Opus',
+      name: 'Claude 3 Opus (High Intelligence)',
+      contextWindow: 200000,
+      supportsVision: true,
+      supportsThinking: false,
+      supportsTools: true
+    },
+    {
+      id: 'claude-3-haiku-20240307',
+      name: 'Claude 3 Haiku (Fast)',
       contextWindow: 200000,
       supportsVision: true,
       supportsThinking: false,

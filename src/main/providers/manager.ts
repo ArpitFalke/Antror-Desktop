@@ -37,10 +37,29 @@ export class ProviderManager {
         'OpenAI',
         'https://api.openai.com/v1',
         [
-          { id: 'gpt-4o', name: 'GPT-4o (Omni)', contextWindow: 128000, supportsVision: true, supportsThinking: false, supportsTools: true },
-          { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextWindow: 128000, supportsVision: true, supportsThinking: false, supportsTools: true },
-          { id: 'o3-mini', name: 'o3-mini (High Reasoning)', contextWindow: 200000, supportsVision: false, supportsThinking: true, supportsTools: true },
-          { id: 'o1', name: 'o1 (Full Reasoning)', contextWindow: 200000, supportsVision: true, supportsThinking: true, supportsTools: true }
+          { id: 'gpt-6-preview', name: 'GPT-6 Preview (Frontier Architecture)', contextWindow: 256000, supportsVision: true, supportsThinking: true, supportsTools: true },
+          { id: 'gpt-6', name: 'GPT-6 (Omni Core)', contextWindow: 256000, supportsVision: true, supportsThinking: true, supportsTools: true },
+          { id: 'o3', name: 'o3 (High-Tier Autonomous Reasoning)', contextWindow: 200000, supportsVision: true, supportsThinking: true, supportsTools: true },
+          { id: 'o3-mini', name: 'o3-mini (High Reasoning & Coding)', contextWindow: 200000, supportsVision: false, supportsThinking: true, supportsTools: true },
+          { id: 'o1', name: 'o1 (Full Reasoning)', contextWindow: 200000, supportsVision: true, supportsThinking: true, supportsTools: true },
+          { id: 'gpt-4o', name: 'GPT-4o (Omni Multimodal)', contextWindow: 128000, supportsVision: true, supportsThinking: false, supportsTools: true },
+          { id: 'gpt-4o-mini', name: 'GPT-4o Mini (Fast)', contextWindow: 128000, supportsVision: true, supportsThinking: false, supportsTools: true }
+        ]
+      )
+    );
+
+    // 4. NVIDIA NIM
+    this.registerAdapter(
+      new OpenAICompatibleAdapter(
+        'nvidia',
+        'NVIDIA NIM (Inference Microservices)',
+        'https://integrate.api.nvidia.com/v1',
+        [
+          { id: 'deepseek-ai/deepseek-r1', name: 'DeepSeek R1 (NVIDIA Accelerated)', contextWindow: 128000, supportsVision: false, supportsThinking: true, supportsTools: true },
+          { id: 'nvidia/llama-3.1-nemotron-70b-instruct', name: 'Llama 3.1 Nemotron 70B (NVIDIA)', contextWindow: 128000, supportsVision: false, supportsThinking: false, supportsTools: true },
+          { id: 'meta/llama-3.3-70b-instruct', name: 'Llama 3.3 70B (NVIDIA NIM)', contextWindow: 128000, supportsVision: false, supportsThinking: false, supportsTools: true },
+          { id: 'nvidia/nemotron-4-340b-instruct', name: 'Nemotron-4 340B Instruct', contextWindow: 128000, supportsVision: false, supportsThinking: false, supportsTools: true },
+          { id: 'mistralai/mixtral-8x22b-instruct-v0.1', name: 'Mixtral 8x22B Instruct', contextWindow: 65000, supportsVision: false, supportsThinking: false, supportsTools: true }
         ]
       )
     );

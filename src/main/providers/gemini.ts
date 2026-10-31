@@ -8,8 +8,16 @@ export class GeminiAdapter implements ProviderAdapter {
 
   defaultModels: ModelInfo[] = [
     {
-      id: 'gemini-2.5-flash',
-      name: 'Gemini 2.5 Flash (Ultra Fast & Adaptive Thinking)',
+      id: 'gemini-3.8-flash',
+      name: 'Gemini 3.8 Flash (Next-Gen Multi-Turn & Reasoning)',
+      contextWindow: 2000000,
+      supportsVision: true,
+      supportsThinking: true,
+      supportsTools: true
+    },
+    {
+      id: 'gemini-3.5-flash',
+      name: 'Gemini 3.5 Flash (Ultra-Low Latency)',
       contextWindow: 1000000,
       supportsVision: true,
       supportsThinking: true,
@@ -17,8 +25,16 @@ export class GeminiAdapter implements ProviderAdapter {
     },
     {
       id: 'gemini-2.5-pro',
-      name: 'Gemini 2.5 Pro (Deep Reasoning & Multimodal)',
+      name: 'Gemini 2.5 Pro (Deep Multimodal Reasoning)',
       contextWindow: 2000000,
+      supportsVision: true,
+      supportsThinking: true,
+      supportsTools: true
+    },
+    {
+      id: 'gemini-2.5-flash',
+      name: 'Gemini 2.5 Flash',
+      contextWindow: 1000000,
       supportsVision: true,
       supportsThinking: true,
       supportsTools: true

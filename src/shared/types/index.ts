@@ -81,6 +81,7 @@ export type LLMProviderId =
   | 'anthropic'
   | 'openai'
   | 'gemini'
+  | 'nvidia'
   | 'deepseek'
   | 'groq'
   | 'mistral'
